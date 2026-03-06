@@ -65,19 +65,6 @@ class _HomePageState extends State<HomePage> {
       (state) => setState(() => _authState = state),
       onError: (Object error) => setState(() => _error = error.toString()),
     );
-    _autoLogin();
-  }
-
-  Future<void> _autoLogin() async {
-    final state = await _sdk.authState.first;
-    if (state is! SdkAuthStateAuthenticated &&
-        state is! SdkAuthStateInProgress) {
-      try {
-        await _sdk.login();
-      } on PlatformException catch (e) {
-        if (mounted) setState(() => _error = '${e.code}: ${e.message}');
-      }
-    }
   }
 
   @override
