@@ -120,14 +120,13 @@ void main() {
       final sub = ZingSdk.instance.authState.listen(states.add);
 
       mockPlatform.emitAuthState(const SdkAuthStateInProgress());
-      mockPlatform.emitAuthState(const SdkAuthStateAuthenticated('user-1'));
+      mockPlatform.emitAuthState(const SdkAuthStateAuthenticated());
 
       await Future<void>.delayed(Duration.zero);
 
       expect(states, hasLength(2));
       expect(states[0], isA<SdkAuthStateInProgress>());
       expect(states[1], isA<SdkAuthStateAuthenticated>());
-      expect((states[1] as SdkAuthStateAuthenticated).partnerUserId, 'user-1');
 
       await sub.cancel();
     });
@@ -164,18 +163,11 @@ void main() {
       expect(state, isA<SdkAuthStateInProgress>());
     });
 
-    test('error', () {
-      final state = SdkAuthState.fromMap({'state': 'error'});
-      expect(state, isA<SdkAuthStateError>());
-    });
-
     test('authenticated', () {
       final state = SdkAuthState.fromMap({
         'state': 'authenticated',
-        'partnerUserId': 'u-42',
       });
       expect(state, isA<SdkAuthStateAuthenticated>());
-      expect((state as SdkAuthStateAuthenticated).partnerUserId, 'u-42');
     });
 
     test('unknown state throws', () {

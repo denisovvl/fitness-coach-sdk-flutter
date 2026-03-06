@@ -86,33 +86,35 @@ class ZingSdkInitializerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler,
     }
 
     private fun handleInit(call: MethodCall, result: MethodChannel.Result) {
-        runCatching {
-            val type = call.argument<String>("type")
-            val auth = when (type) {
-                "apiKey" -> {
-                    val apiKey = call.argument<String>("apiKey")
-                        ?: throw IllegalArgumentException("apiKey is required")
-                    SdkAuthentication.ApiKey(apiKey = apiKey)
-                }
+        scope.launch {
+            runCatching {
+                val type = call.argument<String>("type")
+                val auth = when (type) {
+                    "apiKey" -> {
+                        val apiKey = call.argument<String>("apiKey")
+                            ?: throw IllegalArgumentException("apiKey is required")
+                        SdkAuthentication.ApiKey(apiKey = apiKey)
+                    }
 
-                "externalToken" -> {
-                    SdkAuthentication.ExternalToken(
-                        authTokenCallback = FlutterAuthTokenCallback(authTokenCallbackChannel)
-                    )
-                }
+                    "externalToken" -> {
+                        SdkAuthentication.ExternalToken(
+                            authTokenCallback = FlutterAuthTokenCallback(authTokenCallbackChannel)
+                        )
+                    }
 
-                else -> throw IllegalArgumentException("Unknown auth type: $type")
+                    else -> throw IllegalArgumentException("Unknown auth type: $type")
+                }
+                ZingSdk.init(auth)
+                Log.i(TAG, "Zing SDK initialized with auth type: $type")
+                result.success(null)
+            }.onFailure { throwable ->
+                Log.e(TAG, "Failed to initialize Zing SDK", throwable)
+                result.error(
+                    "native_init_failed",
+                    throwable.message,
+                    Log.getStackTraceString(throwable)
+                )
             }
-            ZingSdk.init(auth)
-            Log.i(TAG, "Zing SDK initialized with auth type: $type")
-            result.success(null)
-        }.onFailure { throwable ->
-            Log.e(TAG, "Failed to initialize Zing SDK", throwable)
-            result.error(
-                "native_init_failed",
-                throwable.message,
-                Log.getStackTraceString(throwable)
-            )
         }
     }
 
