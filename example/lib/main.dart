@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -7,9 +9,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    await ZingSdkInitializer.instance.initialize();
+    await ZingSdk.instance.init(
+      SdkAuthentication.apiKey(
+        ios: 'yVbJzsVP.33rljbAHo9zm4zbyeOvc0dDV3bSSgDxf',
+        android: 'BFmIaLAC.7ACCWtEDJjxX5OxiYftMVOd0zHIW580S',
+      ),
+    );
   } on PlatformException catch (error, stackTrace) {
-    debugPrint('Failed to initialize Zing SDK: ${error.message}');
     debugPrintStack(stackTrace: stackTrace);
   }
 
@@ -41,15 +47,53 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final _sdk = ZingSdkInitializer.instance;
+  final _sdk = ZingSdk.instance;
   String? _error;
+  SdkAuthState? _authState;
+  StreamSubscription<SdkAuthState>? _authStateSub;
 
-  Future<void> _openScreen(ZingSdkScreen screen) async {
+  static const _routes = <(String, StartingRoute)>[
+    ('Custom Workout', CustomWorkoutRoute()),
+    ('AI Assistant', AiAssistantRoute()),
+    ('Workout Plan Details', WorkoutPlanDetailsRoute()),
+    ('Full Schedule', FullScheduleRoute()),
+    ('Home', HomeRoute()),
+    ('Profile Settings', ProfileSettingsRoute()),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _authStateSub = _sdk.authState.listen(
+      (state) => setState(() => _authState = state),
+      onError: (Object error) => setState(() => _error = error.toString()),
+    );
+  }
+
+  @override
+  void dispose() {
+    _authStateSub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loginOrLogout() async {
     setState(() => _error = null);
     try {
-      await _sdk.openScreen(screen);
-    } on StateError catch (e) {
-      setState(() => _error = e.message);
+      final state = _authState;
+      if (state is SdkAuthStateAuthenticated) {
+        await _sdk.logout();
+      } else if (state is! SdkAuthStateInProgress) {
+        await _sdk.login();
+      }
+    } on PlatformException catch (e) {
+      setState(() => _error = '${e.code}: ${e.message}');
+    }
+  }
+
+  Future<void> _openScreen(StartingRoute route) async {
+    setState(() => _error = null);
+    try {
+      await _sdk.openScreen(route);
     } on PlatformException catch (e) {
       setState(() => _error = '${e.code}: ${e.message}');
     }
@@ -59,26 +103,43 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Zing SDK Example')),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const SizedBox(height: 200, child: WorkoutPlanCardHost()),
-          if (_error != null) ...[
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const WorkoutPlanCardHost(),
             const SizedBox(height: 16),
-            Text(
-              _error!,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ],
-          const SizedBox(height: 24),
-          for (final screen in ZingSdkScreen.values) ...[
-            OutlinedButton(
-              onPressed: () => _openScreen(screen),
-              child: Text(screen.name),
+            FilledButton(
+              onPressed: _authState is SdkAuthStateInProgress
+                  ? null
+                  : _loginOrLogout,
+              child: Text(
+                switch (_authState) {
+                  SdkAuthStateAuthenticated() => 'Logout',
+                  SdkAuthStateInProgress() => 'In Progress...',
+                  _ => 'Login',
+                },
+              ),
             ),
             const SizedBox(height: 8),
+            Text('Auth state: ${_authState ?? 'unknown'}'),
+            if (_error != null) ...[
+              const SizedBox(height: 16),
+              Text(
+                _error!,
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.error),
+              ),
+            ],
+            const SizedBox(height: 24),
+            for (final (label, route) in _routes) ...[
+              OutlinedButton(
+                onPressed: () => _openScreen(route),
+                child: Text(label),
+              ),
+              const SizedBox(height: 8),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
