@@ -25,7 +25,6 @@ class ZingSdkInitializerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler,
         private const val AUTH_STATE_CHANNEL_NAME = "zing_sdk_initializer/auth_state"
         private const val AUTH_TOKEN_CALLBACK_CHANNEL_NAME =
             "zing_sdk_initializer/auth_token_callback"
-        private const val PLATFORM_VIEW_TYPE_WORKOUT_PLAN_CARD = "workout-plan-card-view"
         private const val TAG = "ZingSdkInitializer"
         private const val METHOD_INIT = "init"
         private const val METHOD_LOGIN = "login"
@@ -34,6 +33,7 @@ class ZingSdkInitializerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler,
         private const val ARG_ROUTE = "route"
 
         private object RouteKeys {
+            const val HOME = "home"
             const val CUSTOM_WORKOUT = "custom_workout"
             const val AI_ASSISTANT = "ai_assistant"
             const val WORKOUT_PLAN_DETAILS = "workout_plan_details"
@@ -57,13 +57,6 @@ class ZingSdkInitializerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler,
 
         authTokenCallbackChannel =
             MethodChannel(binding.binaryMessenger, AUTH_TOKEN_CALLBACK_CHANNEL_NAME)
-
-        binding
-            .platformViewRegistry
-            .registerViewFactory(
-                PLATFORM_VIEW_TYPE_WORKOUT_PLAN_CARD,
-                WorkoutPlanCardViewFactory()
-            )
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -172,6 +165,7 @@ class ZingSdkInitializerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler,
         }
 
         val startingRoute = when (routeKey) {
+            RouteKeys.HOME -> StartingRoute.Home
             RouteKeys.CUSTOM_WORKOUT -> StartingRoute.CustomWorkout
             RouteKeys.AI_ASSISTANT -> StartingRoute.AiAssistant
             RouteKeys.WORKOUT_PLAN_DETAILS -> StartingRoute.WorkoutPlanDetails
