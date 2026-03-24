@@ -53,11 +53,11 @@ class _HomePageState extends State<HomePage> {
   StreamSubscription<SdkAuthState>? _authStateSub;
 
   static const _routes = <(String, StartingRoute)>[
+    ('Home', HomeRoute()),
     ('Custom Workout', CustomWorkoutRoute()),
     ('AI Assistant', AiAssistantRoute()),
     ('Workout Plan Details', WorkoutPlanDetailsRoute()),
     ('Full Schedule', FullScheduleRoute()),
-    ('Home', HomeRoute()),
     ('Profile Settings', ProfileSettingsRoute()),
   ];
 
@@ -105,36 +105,43 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(title: const Text('Zing SDK Example')),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const WorkoutPlanCardHost(),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: _authState is SdkAuthStateInProgress
-                  ? null
-                  : _loginOrLogout,
-              child: Text(
-                switch (_authState) {
-                  SdkAuthStateAuthenticated() => 'Logout',
-                  SdkAuthStateInProgress() => 'In Progress...',
-                  _ => 'Login',
-                },
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: FilledButton(
+                onPressed: _authState is SdkAuthStateInProgress
+                    ? null
+                    : _loginOrLogout,
+                child: Text(
+                  switch (_authState) {
+                    SdkAuthStateAuthenticated() => 'Logout',
+                    SdkAuthStateInProgress() => 'In Progress...',
+                    _ => 'Login',
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 8),
-            Text('Auth state: ${_authState ?? 'unknown'}'),
+            Center(child: Text('Auth state: ${_authState ?? 'unknown'}')),
             if (_error != null) ...[
               const SizedBox(height: 16),
-              Text(
-                _error!,
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.error),
+              Center(
+                child: Text(
+                  _error!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
               ),
             ],
-            const SizedBox(height: 24),
+            const SizedBox(height: 48),
             for (final (label, route) in _routes) ...[
-              OutlinedButton(
-                onPressed: () => _openScreen(route),
-                child: Text(label),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: OutlinedButton(
+                  onPressed: () => _openScreen(route),
+                  child: Text(label),
+                ),
               ),
               const SizedBox(height: 8),
             ],

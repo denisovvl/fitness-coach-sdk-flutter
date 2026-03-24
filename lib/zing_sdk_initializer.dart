@@ -6,7 +6,6 @@ import 'zing_sdk_initializer_platform_interface.dart';
 export 'sdk_auth_state.dart';
 export 'sdk_authentication.dart';
 export 'starting_route.dart';
-export 'workout_plan_card_view.dart';
 
 /// Public API for initializing and interacting with the native Zing SDK.
 class ZingSdk {
