@@ -2,7 +2,6 @@ plugins {
     id(libs.plugins.android.application.get().pluginId)
     id(libs.plugins.kotlin.android.get().pluginId)
     id("kotlin-parcelize")
-    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
