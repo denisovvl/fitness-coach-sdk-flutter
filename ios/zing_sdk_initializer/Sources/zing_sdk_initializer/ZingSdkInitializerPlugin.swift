@@ -89,7 +89,7 @@ public class ZingSdkInitializerPlugin: NSObject, FlutterPlugin {
             return
         }
 
-        let authentication: ZingSDK.InitializationParameters.AuthenticationType
+        let authentication: ZingSDK.AuthenticationType
         switch type {
         case "apiKey":
             guard let key = args["apiKey"] as? String else {
@@ -102,7 +102,7 @@ public class ZingSdkInitializerPlugin: NSObject, FlutterPlugin {
                 completion(PluginError.nativeInitFailed.toFlutter())
                 return
             }
-            authentication = .externalToken(provider: AuthAdapter(channel: channel))
+            authentication = .externalToken(provider: AuthAdapter(channel: channel), errorHandler: self)
         default:
             completion(PluginError.nativeInitFailed.toFlutter())
             return
@@ -110,7 +110,7 @@ public class ZingSdkInitializerPlugin: NSObject, FlutterPlugin {
 
         Task { @MainActor in
             let result = await ZingSDK.initialize(
-                with: .init(authentication: authentication, errorHandler: self)
+                with: .init(authentication: authentication)
             )
             switch result {
             case .success(let sdkInstance):
@@ -211,8 +211,8 @@ public class ZingSdkInitializerPlugin: NSObject, FlutterPlugin {
 }
 
 extension ZingSdkInitializerPlugin: ZingSDK.ErrorHandler {
-    public func didReceiveError(_ error: ZingSDK.Error) {
-        if case .authError(.badToken) = error {
+    public func didReceiveError(_ error: AuthError) {
+        if case .badToken = error {
             DispatchQueue.main.async { [weak self] in
                 self?.authTokenChannel?.invokeMethod("onTokenInvalid", arguments: nil)
             }

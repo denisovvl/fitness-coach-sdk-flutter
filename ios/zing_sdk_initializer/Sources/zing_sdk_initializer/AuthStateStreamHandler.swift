@@ -27,7 +27,7 @@ final class AuthStateStreamHandler: NSObject, FlutterStreamHandler {
     }
 }
 
-private extension ZingSDK.LoginState {
+private extension LoginState {
     func toFlutter() -> [String: String] {
         switch self {
         case .loggedOut:
