@@ -18,28 +18,19 @@ extension ZingSdkInitializerPlugin.PluginError: FlutterCodableError {
     }
 }
 
-extension ZingSDK.Error: FlutterCodableError {
-    var flutterCode: String {
-        switch self {
-        case .authError: "auth_error"
-        case .loginError: "login_failed"
-        }
-    }
-}
-
-extension ZingSDK.AuthError: FlutterCodableError {
+extension AuthError: FlutterCodableError {
     var flutterCode: String {
         "auth_error"
     }
 }
 
-extension ZingSDK.LoginError: FlutterCodableError {
+extension LoginError: FlutterCodableError {
     var flutterCode: String {
         "login_failed"
     }
 }
 
-extension ZingSDK.LogoutError: FlutterCodableError {
+extension LogoutError: FlutterCodableError {
     var flutterCode: String {
         "logout_failed"
     }
