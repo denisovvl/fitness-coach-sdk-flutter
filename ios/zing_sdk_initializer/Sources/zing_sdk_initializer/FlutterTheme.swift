@@ -9,9 +9,9 @@ struct FlutterTheme {
     func build() -> DesignSystem.Theme {
         DesignSystem.Theme(
             colors: colorsProvider(),
-            cornersRounding: nil,
-            typography: nil,
-            assets: nil
+            cornersRounding: cornersRoundingProvider(),
+            typography: typographyProvider(),
+            assets: assetsProvider()
         )
     }
 
@@ -28,13 +28,31 @@ struct FlutterTheme {
         return TokenProvider { colors[$0.token] }
     }
 
-    private func cornersRoundingProvider() {
+    private func cornersRoundingProvider() -> TokenProvider<RadiusToken, RadiusAttribute>? {
+        guard let rawCornersRounding = arguments["cornersRounding"] as? [String: Any] else {
+            return nil
+        }
+
+        let cornersRounding = rawCornersRounding
+            .compactMapValues { $0 as? [String: Any] }
+            .filter { RadiusToken(token: $0.key) != nil }
+            .compactMapValues(RadiusAttribute.init(entry:))
+
+        return TokenProvider { cornersRounding[$0.token] }
     }
 
-    private func typographyProvider() {
+    private func typographyProvider() -> TokenProvider<TypographyToken, TypographyAttributes>? {
+        guard UIFont.familyNames.contains(customFontFamily) else {
+            return nil
+        }
+
+        return TokenProvider { _ in
+            TypographyAttributes(fontFamily: customFontFamily)
+        }
     }
 
-    private func assetsProvider() {
+    private func assetsProvider() -> TokenProvider<AssetToken, UIImage> {
+        TokenProvider { UIImage(named: $0.token) }
     }
 }
 

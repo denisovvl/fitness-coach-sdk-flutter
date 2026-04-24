@@ -113,9 +113,9 @@ public class ZingSdkInitializerPlugin: NSObject, FlutterPlugin {
         if let configDict = args["configuration"] as? [String: Any] {
             guard
                 let coachesRaw = configDict["coachesAvailability"] as? String,
-                let coaches = Self.coachesAvailability(from: coachesRaw),
+                let coaches = CoachesAvailability(rawValue: coachesRaw),
                 let genderRaw = configDict["genderAvailability"] as? String,
-                let gender = Self.genderAvailability(from: genderRaw)
+                let gender = GenderAvailability(rawValue: genderRaw)
             else {
                 completion(PluginError.nativeInitFailed.toFlutter())
                 return
