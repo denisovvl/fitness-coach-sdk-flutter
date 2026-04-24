@@ -29,10 +29,12 @@ void main() {
     debugDefaultTargetPlatformOverride = TargetPlatform.android;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
 
-    await platform.init(const SdkAuthentication.apiKey(
-      ios: 'ios-key',
-      android: 'android-key',
-    ));
+    await platform.init(
+      authentication: const SdkAuthentication.apiKey(
+        ios: 'ios-key',
+        android: 'android-key',
+      ),
+    );
 
     expect(capturedCall?.method, 'init');
     expect(
@@ -45,10 +47,12 @@ void main() {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
 
-    await platform.init(const SdkAuthentication.apiKey(
-      ios: 'ios-key',
-      android: 'android-key',
-    ));
+    await platform.init(
+      authentication: const SdkAuthentication.apiKey(
+        ios: 'ios-key',
+        android: 'android-key',
+      ),
+    );
 
     expect(capturedCall?.method, 'init');
     expect(
@@ -58,12 +62,82 @@ void main() {
   });
 
   test('init with externalToken sends correct arguments', () async {
-    await platform.init(SdkAuthentication.externalToken(_StubCallback()));
+    await platform.init(
+      authentication: SdkAuthentication.externalToken(_StubCallback()),
+    );
 
     expect(capturedCall?.method, 'init');
     expect(
       capturedCall?.arguments,
       equals({'type': 'externalToken'}),
+    );
+  });
+
+  test('init forwards configuration as method channel args', () async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+    await platform.init(
+      authentication: const SdkAuthentication.apiKey(
+        ios: 'ios-key',
+        android: 'android-key',
+      ),
+      configuration: const SdkConfiguration(
+        coachesAvailability: CoachesAvailability.userGenderBased,
+        genderAvailability: GenderAvailability.binary,
+      ),
+    );
+
+    expect(capturedCall?.method, 'init');
+    expect(
+      capturedCall?.arguments,
+      equals({
+        'type': 'apiKey',
+        'apiKey': 'ios-key',
+        'configuration': {
+          'coachesAvailability': 'userGenderBased',
+          'genderAvailability': 'binary',
+        },
+      }),
+    );
+  });
+
+  test('init forwards theme payload', () async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+    await platform.init(
+      authentication: const SdkAuthentication.apiKey(
+        ios: 'ios-key',
+        android: 'android-key',
+      ),
+      theme: const SdkTheme(
+        colors: SdkColors(
+          brandPrimary: Color(0xFFFF0000),
+          overlayBlackDark: Color(0xA0000000),
+          bgLightGrey: Color(0x80123456),
+        ),
+        cornersRounding: SdkCornerRounding(buttonBorder: SdkRadius.value(16.0)),
+      ),
+    );
+
+    expect(capturedCall?.method, 'init');
+    expect(
+      capturedCall?.arguments,
+      equals({
+        'type': 'apiKey',
+        'apiKey': 'ios-key',
+        'theme': {
+          'colors': {
+            'brand/primary': 0xFFFF0000,
+            'overlay/black-dark': 0xA0000000,
+            'bg/light-grey': 0x80123456,
+          },
+          'cornersRounding': {
+            'button/border': {'type': 'value', 'value': 16.0},
+          },
+        },
+      }),
     );
   });
 

@@ -19,9 +19,13 @@ class _MockZingSdkInitializerPlatform
   final _authStateController = StreamController<SdkAuthState>.broadcast();
 
   @override
-  Future<void> init(SdkAuthentication auth) async {
+  Future<void> init({
+    required SdkAuthentication authentication,
+    SdkConfiguration? configuration,
+    SdkTheme? theme,
+  }) async {
     initCount += 1;
-    lastAuth = auth;
+    lastAuth = authentication;
   }
 
   @override
@@ -84,7 +88,7 @@ void main() {
         ios: 'ios-key',
         android: 'android-key',
       );
-      await ZingSdk.instance.init(auth);
+      await ZingSdk.instance.init(authentication: auth);
 
       expect(mockPlatform.initCount, equals(1));
       expect(mockPlatform.lastAuth, isA<SdkPlatformApiKeyAuth>());
