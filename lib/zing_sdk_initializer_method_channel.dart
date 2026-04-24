@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 
 import 'sdk_auth_state.dart';
 import 'sdk_authentication.dart';
+import 'sdk_configuration.dart';
+import 'sdk_theme.dart';
 import 'starting_route.dart';
 import 'zing_sdk_initializer_platform_interface.dart';
 
@@ -27,18 +29,32 @@ class MethodChannelZingSdkInitializer extends ZingSdkInitializerPlatform {
   AuthTokenCallback? _authTokenCallback;
 
   @override
-  Future<void> init(SdkAuthentication auth) {
-    final Map<String, dynamic> args;
-    switch (auth) {
+  Future<void> init({
+    required SdkAuthentication authentication,
+    SdkConfiguration? configuration,
+    SdkTheme? theme,
+  }) {
+    final args = <String, dynamic>{};
+    switch (authentication) {
       case SdkPlatformApiKeyAuth(:final ios, :final android):
         final apiKey =
             defaultTargetPlatform == TargetPlatform.iOS ? ios : android;
-        args = {'type': 'apiKey', 'apiKey': apiKey};
+        args['type'] = 'apiKey';
+        args['apiKey'] = apiKey;
       case SdkExternalTokenAuth(:final callback):
         _authTokenCallback = callback;
         _setupAuthTokenCallbackHandler();
-        args = {'type': 'externalToken'};
+        args['type'] = 'externalToken';
     }
+
+    if (configuration != null) {
+      args['configuration'] = configuration.toMap();
+    }
+
+    if (theme != null) {
+      args['theme'] = theme.toMap();
+    }
+
     return methodChannel.invokeMethod<void>('init', args);
   }
 
