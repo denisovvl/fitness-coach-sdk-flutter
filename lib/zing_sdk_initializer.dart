@@ -1,10 +1,14 @@
 import 'sdk_auth_state.dart';
 import 'sdk_authentication.dart';
+import 'sdk_configuration.dart';
+import 'sdk_theme.dart';
 import 'starting_route.dart';
 import 'zing_sdk_initializer_platform_interface.dart';
 
 export 'sdk_auth_state.dart';
 export 'sdk_authentication.dart';
+export 'sdk_configuration.dart';
+export 'sdk_theme.dart';
 export 'starting_route.dart';
 
 /// Public API for initializing and interacting with the native Zing SDK.
@@ -13,9 +17,18 @@ class ZingSdk {
 
   static final ZingSdk instance = ZingSdk._();
 
-  /// Initializes the native SDK with the given authentication configuration.
-  Future<void> init(SdkAuthentication auth) {
-    return ZingSdkInitializerPlatform.instance.init(auth);
+  /// Initializes the native SDK with the given authentication and optional
+  /// [configuration] and [theme].
+  Future<void> init({
+    required SdkAuthentication authentication,
+    SdkConfiguration? configuration,
+    SdkTheme? theme,
+  }) {
+    return ZingSdkInitializerPlatform.instance.init(
+      authentication: authentication,
+      configuration: configuration,
+      theme: theme,
+    );
   }
 
   /// Triggers the login flow in the native SDK.

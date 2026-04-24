@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+import DesignSystem
 import ZingCoachSDK
 
 public class ZingSdkInitializerPlugin: NSObject, FlutterPlugin {
@@ -108,10 +109,34 @@ public class ZingSdkInitializerPlugin: NSObject, FlutterPlugin {
             return
         }
 
-        Task { @MainActor in
-            let result = await ZingSDK.initialize(
-                with: .init(authentication: authentication)
+        let configuration: ZingSDK.Configuration
+        if let configDict = args["configuration"] as? [String: Any] {
+            guard
+                let coachesRaw = configDict["coachesAvailability"] as? String,
+                let coaches = Self.coachesAvailability(from: coachesRaw),
+                let genderRaw = configDict["genderAvailability"] as? String,
+                let gender = Self.genderAvailability(from: genderRaw)
+            else {
+                completion(PluginError.nativeInitFailed.toFlutter())
+                return
+            }
+            configuration = ZingSDK.Configuration(
+                coachesAvailability: coaches,
+                genderAvailability: gender
             )
+        } else {
+            configuration = ZingSDK.Configuration()
+        }
+
+        let theme = (args["theme"] as? [String: Any]).map { FlutterTheme(arguments: $0).build() }
+        let parameters = ZingSDK.InitializationParameters(
+            authentication: authentication,
+            theme: theme,
+            configuration: configuration
+        )
+
+        Task { @MainActor in
+            let result = await ZingSDK.initialize(with: parameters)
             switch result {
             case .success(let sdkInstance):
                 self.sdk = sdkInstance
@@ -207,6 +232,22 @@ public class ZingSdkInitializerPlugin: NSObject, FlutterPlugin {
         viewController.modalPresentationStyle = .fullScreen
         presenter.present(viewController, animated: true)
         completion(nil)
+    }
+
+    private static func coachesAvailability(from raw: String) -> CoachesAvailability? {
+        switch raw {
+        case "allCoaches": .allCoaches
+        case "userGenderBased": .userGenderBased
+        default: nil
+        }
+    }
+
+    private static func genderAvailability(from raw: String) -> GenderAvailability? {
+        switch raw {
+        case "all": .all
+        case "binary": .binary
+        default: nil
+        }
     }
 }
 

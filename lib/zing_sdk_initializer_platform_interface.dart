@@ -2,6 +2,8 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'sdk_auth_state.dart';
 import 'sdk_authentication.dart';
+import 'sdk_configuration.dart';
+import 'sdk_theme.dart';
 import 'starting_route.dart';
 import 'zing_sdk_initializer_method_channel.dart';
 
@@ -27,7 +29,11 @@ abstract class ZingSdkInitializerPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<void> init(SdkAuthentication auth) {
+  Future<void> init({
+    required SdkAuthentication authentication,
+    SdkConfiguration? configuration,
+    SdkTheme? theme,
+  }) {
     throw UnimplementedError('init() has not been implemented.');
   }
 
