@@ -10,9 +10,20 @@ Future<void> main() async {
 
   try {
     await ZingSdk.instance.init(
-      SdkAuthentication.apiKey(
+      authentication: SdkAuthentication.apiKey(
         ios: 'yVbJzsVP.33rljbAHo9zm4zbyeOvc0dDV3bSSgDxf',
         android: 'BFmIaLAC.7ACCWtEDJjxX5OxiYftMVOd0zHIW580S',
+      ),
+      configuration: const SdkConfiguration(
+        coachesAvailability: CoachesAvailability.userGenderBased,
+        genderAvailability: GenderAvailability.binary,
+      ),
+      theme: const SdkTheme(
+        colors: SdkColors(
+          brandPrimary: Color(0xFFF2001F),
+          brandSecondary: Color(0xFF980052),
+          brandTertiary: Color(0xFF1D212C),
+        ),
       ),
     );
   } on PlatformException catch (error, stackTrace) {
