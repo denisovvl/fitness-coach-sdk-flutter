@@ -37,10 +37,10 @@ struct FlutterTheme {
                 return colors["text/heading/light-primary"]
 
             case .textBody(.darkPrimary):
-                return colors["text/dark-primary"]
+                return colors["text/body/dark-primary"]
 
             case .textBody(.darkSecondary):
-                return colors["text/dark-secondary"]
+                return colors["text/body/dark-secondary"]
 
             case .buttonBackground(.darkPrimary):
                 return colors["button/primary"]

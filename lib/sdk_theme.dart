@@ -29,8 +29,8 @@ class SdkColors {
     this.brandSecondary,
     this.textHeadingDarkPrimary,
     this.textHeadingLightPrimary,
-    this.textDarkPrimary,
-    this.textDarkSecondary,
+    this.textBodyDarkPrimary,
+    this.textBodyDarkSecondary,
     this.buttonPrimary,
     this.buttonSecondary,
     this.bgPrimary,
@@ -43,8 +43,8 @@ class SdkColors {
   final Color? textHeadingDarkPrimary;
   final Color? textHeadingLightPrimary;
 
-  final Color? textDarkPrimary;
-  final Color? textDarkSecondary;
+  final Color? textBodyDarkPrimary;
+  final Color? textBodyDarkSecondary;
 
   final Color? buttonPrimary;
   final Color? buttonSecondary;
@@ -64,8 +64,8 @@ class SdkColors {
     put('text/heading/dark-primary', textHeadingDarkPrimary);
     put('text/heading/light-primary', textHeadingLightPrimary);
 
-    put('text/dark-primary', textDarkPrimary);
-    put('text/dark-secondary', textDarkSecondary);
+    put('text/body/dark-primary', textBodyDarkPrimary);
+    put('text/body/dark-secondary', textBodyDarkSecondary);
 
     put('button/primary', buttonPrimary);
     put('button/secondary', buttonSecondary);
